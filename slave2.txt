@@ -1,0 +1,47 @@
+#define ID_SLAVE_1 0xBB
+#define ID_SLAVE_2 0xCC
+#define START_TX_S1 PORTB.F3
+#define ID_MASTER 0xAA
+#define DATA1 0x11
+#define DATA2 0x22
+#define DATA3 0x01
+#define DATA4 0x02
+int receive;
+void main()
+ {
+   trisb=0x0C;
+   PWM1_Init(38000);
+   pwm1_set_duty(127);
+   UART1_Init(9600);
+   while(1)
+   {
+   if(START_TX_S1==1)
+     {
+       do
+         {
+           pwm1_start();
+           Delay_ms(10);
+           UART1_Write( ID_SLAVE_2 );
+           Delay_ms(100);
+           UART1_Write(DATA4);
+           Delay_ms(1000);
+         }
+         while(START_TX_S1==1);
+         pwm1_stop();
+     }
+
+      if(UART1_Data_Ready()==1)
+        {
+                receive= UART1_Read()  ;
+                Delay_ms(100);
+                if(receive==ID_SLAVE_2)
+                  {
+                   receive= UART1_Read()  ;
+                   UART1_Write(receive);
+                   Delay_ms(1000);
+                  }
+
+            }
+
+  }
+ }
